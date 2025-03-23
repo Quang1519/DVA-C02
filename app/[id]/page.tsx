@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, X, Search, ChevronDown, Send, ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import QuizCard from "@/components/quiz-card"
@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter, useParams } from 'next/navigation'
 import questionsData from '../../data/questions.json'
 import Image from "next/image"
+import QuestionPopup from "@/components/question-popup"
 
 // Update the interfaces to properly handle multiple answers
 interface Option {
@@ -44,6 +45,13 @@ const NavigationButton = ({ direction, onClick, disabled }: NavigationButtonProp
   </Button>
 )
 
+// Add this interface and state to QuestionPage component
+interface Interaction {
+  input: string;
+  response: string;
+  citations: string[];
+}
+
 export default function QuestionPage() {
   const router = useRouter()
   const params = useParams()
@@ -57,6 +65,8 @@ export default function QuestionPage() {
   const [questions] = useState<Question[]>(questionsData.questions)
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([])
   const [showAnswer, setShowAnswer] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [questionInteractions, setQuestionInteractions] = useState<Record<number, Interaction[]>>({})
 
   const currentQuestion = useMemo(() => 
     questions[currentQuestionIndex]
@@ -113,6 +123,17 @@ export default function QuestionPage() {
     setShowAnswer(false)
   }, [questionId])
 
+  // Load saved interactions when question changes
+  useEffect(() => {
+    const savedInteractions = localStorage.getItem(`question_${currentQuestion.id}_interactions`);
+    if (savedInteractions) {
+      setQuestionInteractions(prev => ({
+        ...prev,
+        [currentQuestion.id]: JSON.parse(savedInteractions)
+      }));
+    }
+  }, [currentQuestion.id]);
+
   if (!currentQuestion) {
     return <div>Loading...</div>
   }
@@ -121,7 +142,7 @@ export default function QuestionPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-2 sm:p-4">
-      <Card className="w-full max-w-3xl p-3 sm:p-6 shadow-md">
+      <Card className="w-full max-w-3xl p-3 sm:p-6 shadow-md relative">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <h1 className="text-lg sm:text-xl font-semibold text-center sm:text-left">
@@ -140,6 +161,13 @@ export default function QuestionPage() {
               />
             </div>
           </div>
+          <Button
+            variant="outline"
+            className="mt-2 sm:mt-0 w-12 h-12 rounded-full shadow-sm border border-gray-200 bg-transparent hover:bg-gray-50 text-gray-700 flex items-center justify-center"
+            onClick={() => setShowPopup(true)}
+          >
+            Ask
+          </Button>
         </div>
 
         <div className="mb-4 sm:mb-6">
@@ -213,6 +241,25 @@ export default function QuestionPage() {
             Next <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
+
+        {showPopup && (
+          <QuestionPopup
+            question={currentQuestion}
+            onClose={() => setShowPopup(false)}
+            interactions={questionInteractions[currentQuestion.id] || []}
+            onInteractionUpdate={(newInteractions) => {
+              // Update both state and localStorage
+              setQuestionInteractions(prev => ({
+                ...prev,
+                [currentQuestion.id]: newInteractions
+              }));
+              localStorage.setItem(
+                `question_${currentQuestion.id}_interactions`,
+                JSON.stringify(newInteractions)
+              );
+            }}
+          />
+        )}
       </Card>
     </div>
   )
