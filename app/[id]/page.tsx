@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, X, Search, ChevronDown, Send, ArrowUp } from "lucide-react"
+import { ArrowRight, X, Search, ChevronDown, Send, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import QuizCard from "@/components/quiz-card"
@@ -39,9 +39,11 @@ const NavigationButton = ({ direction, onClick, disabled }: NavigationButtonProp
     variant="outline"
     onClick={onClick}
     disabled={disabled}
-    className="nav-button"
+    className="nav-button bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 p-0 flex items-center justify-center"
   >
-    {direction === 'prev' ? '←' : '→'}
+    {direction === 'prev' ? 
+      <ChevronLeft className="h-5 w-5" /> : 
+      <ChevronRight className="h-5 w-5" />}
   </Button>
 )
 
@@ -145,7 +147,10 @@ export default function QuestionPage() {
       <Card className="w-full max-w-3xl p-3 sm:p-6 shadow-md relative">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            <h1 className="text-lg sm:text-xl font-semibold text-center sm:text-left">
+            <h1 
+              className="text-lg sm:text-xl font-semibold text-center sm:text-left cursor-pointer hover:text-green-600 transition-colors"
+              onClick={() => router.push('/')}
+            >
               Question {currentQuestionIndex + 1} of {questions.length}
             </h1>
             <div className="flex gap-2 mt-2 sm:mt-0">
@@ -162,10 +167,11 @@ export default function QuestionPage() {
             </div>
           </div>
           <Button
-            variant="outline"
-            className="mt-2 sm:mt-0 w-12 h-12 rounded-full shadow-sm border border-gray-200 bg-transparent hover:bg-gray-50 text-gray-700 flex items-center justify-center"
+            variant="default"
+            className="mt-2 sm:mt-0 bg-slate-100 hover:bg-slate-200 text-gray-700 flex items-center justify-center gap-1 px-4 py-2 rounded-full"
             onClick={() => setShowPopup(true)}
           >
+            <Search className="h-4 w-4" />
             Ask
           </Button>
         </div>

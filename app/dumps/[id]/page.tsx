@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, X, Search, ChevronDown, Send, ArrowUp } from "lucide-react"
+import { ArrowRight, X, Search, ChevronDown, Send, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import QuizCard from "@/components/quiz-card"
@@ -41,9 +41,11 @@ const NavigationButton = ({ direction, onClick, disabled }: NavigationButtonProp
     variant="outline"
     onClick={onClick}
     disabled={disabled}
-    className="nav-button"
+    className="nav-button bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 p-0 flex items-center justify-center"
   >
-    {direction === 'prev' ? '←' : '→'}
+    {direction === 'prev' ? 
+      <ChevronLeft className="h-5 w-5" /> : 
+      <ChevronRight className="h-5 w-5" />}
   </Button>
 )
 
@@ -127,7 +129,7 @@ export default function QuestionPage() {
 
   // Load saved interactions when question changes
   useEffect(() => {
-    const savedInteractions = localStorage.getItem(`question_${currentQuestion.id}_interactions`);
+    const savedInteractions = localStorage.getItem(`question_dump_${currentQuestion.id}_interactions`);
     if (savedInteractions) {
       setQuestionInteractions(prev => ({
         ...prev,
@@ -140,6 +142,37 @@ export default function QuestionPage() {
     return <div>Loading...</div>
   }
 
+  // Function to convert URLs in text to clickable links
+  const makeUrlsClickable = (text: string) => {
+    if (!text) return "";
+    
+    // Regular expression to match URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    // Split the text by URLs
+    const parts = text.split(urlRegex);
+    
+    // Map through the parts and create JSX elements
+    return parts.map((part, index) => {
+      // Check if this part is a URL
+      if (part.match(urlRegex)) {
+        return (
+          <a 
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      // Return regular text
+      return part;
+    });
+  };
+
   const isMultipleAnswer = currentQuestion.correctAnswer.id.length > 1
 
   return (
@@ -147,7 +180,10 @@ export default function QuestionPage() {
       <Card className="w-full max-w-3xl p-3 sm:p-6 shadow-md relative">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            <h1 className="text-lg sm:text-xl font-semibold text-center sm:text-left">
+            <h1 
+              className="text-lg sm:text-xl font-semibold text-center sm:text-left cursor-pointer hover:text-green-600 transition-colors"
+              onClick={() => router.push('/')}
+            >
               Question {currentQuestionIndex + 1} of {questions.length}
             </h1>
             <div className="flex gap-2 mt-2 sm:mt-0">
@@ -164,10 +200,11 @@ export default function QuestionPage() {
             </div>
           </div>
           <Button
-            variant="outline"
-            className="mt-2 sm:mt-0 w-12 h-12 rounded-full shadow-sm border border-gray-200 bg-transparent hover:bg-gray-50 text-gray-700 flex items-center justify-center"
+            variant="default"
+            className="mt-2 sm:mt-0 bg-slate-100 hover:bg-slate-200 text-gray-700 flex items-center justify-center gap-1 px-4 py-2 rounded-full"
             onClick={() => setShowPopup(true)}
           >
+            <Search className="h-4 w-4" />
             Ask
           </Button>
         </div>
@@ -227,9 +264,9 @@ export default function QuestionPage() {
             {currentQuestion.explaination && (
               <div className="bg-blue-50 rounded-lg p-4 mb-4">
                 <h3 className="font-medium text-gray-700 mb-2 text-base">Explanation:</h3>
-                <p className="text-gray-800 text-sm sm:text-base whitespace-pre-wrap">
-                  {currentQuestion.explaination}
-                </p>
+                <div className="text-gray-800 text-sm sm:text-base whitespace-pre-wrap">
+                  {makeUrlsClickable(currentQuestion.explaination)}
+                </div>
               </div>
             )}
             
@@ -237,9 +274,9 @@ export default function QuestionPage() {
             {currentQuestion.reference && (
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="font-medium text-gray-700 mb-2 text-base">Reference:</h3>
-                <p className="text-gray-800 text-sm sm:text-base">
-                  {currentQuestion.reference}
-                </p>
+                <div className="text-gray-800 text-sm sm:text-base">
+                  {makeUrlsClickable(currentQuestion.reference)}
+                </div>
               </div>
             )}
           </div>
@@ -276,7 +313,7 @@ export default function QuestionPage() {
                 [currentQuestion.id]: newInteractions
               }));
               localStorage.setItem(
-                `question_${currentQuestion.id}_interactions`,
+                `question_dump_${currentQuestion.id}_interactions`,
                 JSON.stringify(newInteractions)
               );
             }}

@@ -153,14 +153,14 @@ export default function QuestionPopup({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full h-[80vh] flex flex-col relative">
         {/* Fixed Header */}
-        <div className="p-4 border-b">
-          <div className="flex items-center justify-between pr-8">
-            <h2 className="font-semibold text-xl">Question</h2>
+        <div className="p-2 border-b">
+          <div className="flex items-center pr-8">
+            <h2 className="font-semibold text-xl mr-3">Question</h2>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClear}
-              className="text-gray-500 hover:text-gray-700 flex items-center gap-2"
+              className="text-gray-500 hover:text-gray-700 flex items-center gap-2 bg-slate-100 px-3 py-1 hover:bg-slate-200"
             >
               Clear History
             </Button>
@@ -233,7 +233,7 @@ export default function QuestionPopup({
         </div>
 
         {/* Fixed Input Area */}
-        <div className="p-4 bg-white">
+        <div className="p-2 bg-white border-b border-l border-r rounded-bl-lg rounded-br-lg">
           <div className="bg-white rounded-2xl border shadow-lg flex flex-col p-2">
             <textarea
               value={inputValue}
@@ -265,14 +265,14 @@ export default function QuestionPopup({
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full"
+                className="rounded-full bg-slate-100 hover:bg-slate-200"
                 onClick={handleApiCall}
                 disabled={!inputValue.trim() || isLoading}
               >
                 {isLoading ? (
-                  <Loader2 className="h-5 w-5 text-slate-400 animate-spin" />
+                  <Loader2 className="h-2 w-2 text-slate-400 animate-spin" />
                 ) : (
-                  <ArrowUp className="h-5 w-5 text-slate-400" />
+                  <ArrowUp className="h-2 w-2 text-gray-500" />
                 )}
               </Button>
             </div>
