@@ -10,7 +10,6 @@ export async function callPerplexityApi(
   model: string
 ): Promise<ApiResponse> {
   try {
-    console.log('API URL:', API_CONFIG.BASE_URL);
     console.log('Using model:', model);
     
     // Check if token is available
