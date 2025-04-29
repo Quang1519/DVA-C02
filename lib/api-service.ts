@@ -1,4 +1,4 @@
-import { API_CONFIG } from './api-config'
+import { API_CONFIG } from './api-config';
 
 interface ApiResponse {
   content: string;
@@ -11,6 +11,10 @@ export async function callPerplexityApi(
 ): Promise<ApiResponse> {
   try {
     console.log('Using model:', model);
+    console.log('API Config:', {
+      baseUrl: API_CONFIG.BASE_URL ? 'Available' : 'Missing',
+      token: API_CONFIG.TOKEN ? 'Available' : 'Missing'
+    });
     
     // Check if token is available
     if (!API_CONFIG.TOKEN) {
@@ -21,6 +25,7 @@ export async function callPerplexityApi(
       };
     }
 
+    // Call Perplexity API directly
     const response = await fetch(API_CONFIG.BASE_URL, {
       method: 'POST',
       headers: {
