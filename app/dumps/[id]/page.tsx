@@ -189,7 +189,7 @@ export default function QuestionPage() {
             <div className="flex gap-2 mt-2 sm:mt-0">
               <NavigationButton
                 direction="prev"
-                onClick={() => router.push(`/${currentQuestionIndex}`)}
+                onClick={() => router.push(`/dumps/${currentQuestionIndex}`)}
                 disabled={currentQuestionIndex === 0}
               />
               <NavigationButton
